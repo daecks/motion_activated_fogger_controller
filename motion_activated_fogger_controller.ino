@@ -1,26 +1,27 @@
+  
     // Handy defines for readability
     #define TURN_LED_ON HIGH
     #define TURN_LED_OFF LOW
-    #define TURN_RELAY_ON LOW
-    #define TURN_RELAY_OFF HIGH
+    #define TURN_FOGGER_ON LOW
+    #define TURN_FOGGER_OFF HIGH
     #define MOTION_DETECTED HIGH
     #define NO_MOTION_DETECTED LOW
-    #define SAMPLE_DELAY 10   // 10 ms delay before sampling again
+    #define SAMPLE_DELAY_MS 10 
 
     
-    int LED = 13;                // specify output pin for LED, for debugging purposes while fogger not attached
-    int RELAY = 3;               // output pin for relay to turn fogger on
-    int IR_SENSOR = 7;           // input pin for motion sensor
+    int LED_OUTPUT_PIN = 13;                // specify output pin for LED, for debugging purposes while fogger not attached
+    int FOGGER_RELAY_OUTPUT_PIN = 3;               // output pin for relay to turn fogger on
+    int IR_SENSOR_INPUT_PIN = 7;           // input pin for motion sensor
     int previousSensorState = NO_MOTION_DETECTED;          // start with no motion detected
     int currentSensorValue = 0;    // variable for reading IR sensor status
-    int FOGGER_ON_TIME = 30000;  // 30 seconds "on" time
-    int FOGGER_REPLENISH_TIME = 60000; // timeout while motion won't be acted on
+    int FOGGER_ON_TIME_MS = 30000;  // 30 seconds "on" time
+    int FOGGER_REPLENISH_TIME_MS = 60000; // timeout while motion won't be acted on
      
     void setup()
     {
-      pinMode(LED, OUTPUT);  
-      pinMode(RELAY, OUTPUT); 
-      pinMode(IR_SENSOR, INPUT);
+      pinMode(LED_OUTPUT_PIN, OUTPUT);  
+      pinMode(FOGGER_RELAY_OUTPUT_PIN, OUTPUT); 
+      pinMode(IR_SENSOR_INPUT_PIN, INPUT);
      
       Serial.begin(9600);
     }
@@ -30,28 +31,28 @@
      
     void loop()
     {
-      currentSensorValue = digitalRead(IR_SENSOR);
+      currentSensorValue = digitalRead(IR_SENSOR_INPUT_PIN);
       if (currentSensorValue == MOTION_DETECTED) {
-        digitalWrite(LED, TURN_LED_ON);
-        digitalWrite(RELAY, TURN_RELAY_ON);
+        digitalWrite(LED_OUTPUT_PIN, TURN_LED_ON);
+        digitalWrite(FOGGER_RELAY_OUTPUT_PIN, TURN_FOGGER_ON);
         if (previousSensorState == NO_MOTION_DETECTED)
         {
           previousSensorState = MOTION_DETECTED;
           Serial.println("Turning on fogger");
-          delay(FOGGER_ON_TIME);
+          delay(FOGGER_ON_TIME_MS);
           Serial.println("Turning off fogger");
         }
-        delay(SAMPLE_DELAY);
+        delay(SAMPLE_DELAY_MS);
       }
       else 
       {
-        digitalWrite(LED, TURN_LED_OFF); 
-        digitalWrite(RELAY, TURN_RELAY_OFF); // turn relay off
+        digitalWrite(LED_OUTPUT_PIN, TURN_LED_OFF); 
+        digitalWrite(FOGGER_RELAY_OUTPUT_PIN, TURN_FOGGER_OFF); 
         if (previousSensorState == MOTION_DETECTED)
         {
           previousSensorState = NO_MOTION_DETECTED;
           Serial.println("Wait for fogger to replenish");
-          delay(FOGGER_REPLENISH_TIME);
+          delay(FOGGER_REPLENISH_TIME_MS);
           Serial.println("Fogger is ready");
         }
       }
